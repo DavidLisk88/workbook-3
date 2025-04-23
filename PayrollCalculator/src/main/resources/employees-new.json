@@ -1,0 +1,42 @@
+[
+    {
+        "grossPay": 656.25,
+        "name": "Dana Wyatt",
+        "id": 10
+    },
+    {
+        "grossPay": 284.75,
+        "name": "Ezra Aiden",
+        "id": 20
+    },
+    {
+        "grossPay": 660,
+        "name": "Brittany Thibbs",
+        "id": 30
+    },
+    {
+        "grossPay": 20,
+        "name": "Zephaniah Hughes",
+        "id": 40
+    },
+    {
+        "grossPay": 542.5,
+        "name": "Caylee Callahan",
+        "id": 50
+    },
+    {
+        "grossPay": 607.5,
+        "name": "Zane Stephens",
+        "id": 60
+    },
+    {
+        "grossPay": 420.75,
+        "name": "Maverick Cummings",
+        "id": 70
+    },
+    {
+        "grossPay": 464,
+        "name": "Kamari Todd",
+        "id": 80
+    }
+]
