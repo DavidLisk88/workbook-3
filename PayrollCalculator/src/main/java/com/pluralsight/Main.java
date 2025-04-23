@@ -13,12 +13,16 @@ public class Main {
 
     public static void main(String[] args) {
 
+        // Create a file pathway for the csv file
         String employeeCsvFile = "src/main/resources/employees.csv";
+
+        // Create a file pathway for where the JSON file will go.
         String employeeJsonFile = "src/main/resources/employees-new.json";
 
-       List<Employee> employeeList = readAllEmployees(employeeCsvFile);
-    //    writeALlEmployees(employeeList, employeeJsonFile);
+        // This function is where we store the data that is read from the csv list.
+       List<Employee> employeeList = readAllEmployees(employeeCsvFile);;
 
+       // Create a while loop for menu options.
       while(true) {
           System.out.println("Hello..");
           waiting();
@@ -27,8 +31,12 @@ public class Main {
           System.out.println("2. Copy CSV file.");
           System.out.println("3. Write to JSON file");
           System.out.println("4. Exit\n");
+
+          // Create a variable for what the user chooses and attach it to the user input.
+          // It will be used for the switch statement below.
           String userChoice = userInput.nextLine().toLowerCase();
 
+          // The switch statement stays inside the while loop and determines the users fate based on their choice.
           switch (userChoice){
               case "1":
                   displayEmployees(employeeList);
@@ -54,45 +62,34 @@ public class Main {
 
     }
 
-    public static void copyNewCsv(List<Employee> employees, String output){
-        try {
-            File newFile = new File(output);
-            BufferedWriter csvWriter = new BufferedWriter((new FileWriter(newFile)));
 
-            for (Employee emp : employees){
-                csvWriter.write(String.format("%d | %s | %.2f | $%.2f\n", emp.getEmployeeId(), emp.getName(), emp.getHoursWorked(), emp.getGrossPay()));
-            }
 
-            csvWriter.close();
-            System.out.println("Yur file is saved...\n" + output);
-
-        } catch (IOException e){
-            System.out.println("Something went wrong...");
-            waiting();
-        }
-    }
-
-    public static void displayEmployees(List<Employee> employees){
-        for(Employee emp : employees){
-            System.out.printf("ID: %d | Name: %s | Hours: %.2f | Gross Pay: $%.2f\n", emp.getEmployeeId(), emp.getName(), emp.getHoursWorked(), emp.getGrossPay());
-        }
-    }
-
+    // THIS METHOD WILL ONLY READ THE CSV FILE FROM THE LIST WE STORED THE DATA IN ABOVE.
     public static List<Employee> readAllEmployees(String filePath) {
         List<Employee> employees = new ArrayList<>();
 
+        // The Buffer reader and FileReader activates the reading of the csv file.
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+
+            // Create a string variable to use for the upcoming splitter.
             String line;
+
+            // This will eat the first line. Skipping the header
             reader.readLine();
 
+            // Tell the reader to keep reading as long as there are lines to read.
+            // But while its doing that,
             while ((line = reader.readLine()) != null) {
+                // Split what you are reading by the pipe.
                 String[] employeeListSplitter = line.split("\\|");
 
+                // Now that we chopped up the meat, put a label on those different pieces of meat.
                 int id = Integer.parseInt(employeeListSplitter[0]);
                 String name = employeeListSplitter[1];
                 double hoursWorked = Double.parseDouble(employeeListSplitter[2]);
                 double payRate = Double.parseDouble(employeeListSplitter[3]);
 
+                // Now we add a newly assembled employee to the employees storage list.
                 employees.add(new Employee(id, name, hoursWorked, payRate));
             }
         } catch (IOException e) {
@@ -101,102 +98,81 @@ public class Main {
         return employees;
     }
 
+    // THIS METHOD WILL PRINT THE READ THE CSV FILE.
+    public static void displayEmployees(List<Employee> employees){
+        // In the parentheses above, I am adding in the employee list variable that works as the storage.
 
-    public static void writeAllEmployees(List<Employee> employees, String output){
+        // For every Employee that we will now call "emp" that's attached to the employees list,
+        for(Employee emp : employees){
+            // Print out their information.
+            System.out.printf("ID: %d | Name: %s | Hours: %.2f | Gross Pay: $%.2f\n", emp.getEmployeeId(), emp.getName(), emp.getHoursWorked(), emp.getGrossPay());
+        }
+    }
+
+
+
+    // THIS METHOD WILL WRITE THE READ CSV FILE.
+    public static void copyNewCsv(List<Employee> employees, String filePath){
+        try {
+            // Create a new variable for the file that we will end up writing on
+            File newFile = new File(filePath);
+            // setup the buffered writer and file writer
+            BufferedWriter csvWriter = new BufferedWriter((new FileWriter(newFile)));
+
+            // For each Employee we now call emp inside of the employees storage,
+            for (Employee emp : employees){
+                // tell the writer to write their information
+                csvWriter.write(String.format("%d | %s | %.2f | $%.2f\n", emp.getEmployeeId(), emp.getName(), emp.getHoursWorked(), emp.getGrossPay()));
+            }
+
+            // close th writer
+            csvWriter.close();
+            // and let the user know that their file is saved.
+            System.out.println("Yur file is saved...\n" + filePath);
+
+        } catch (IOException e){
+            System.out.println("Something went wrong...");
+            waiting();
+        }
+    }
+
+
+
+
+    // THIS METHOD WILL READ THE CSV FILE AND WRITE TO A JSON FILE.
+    public static void writeAllEmployees(List<Employee> employees, String filePath){
+        // Create a JSON array that we will store the information in
         JSONArray jsonArray  = new JSONArray();
 
         for (Employee emp : employees) {
             //initialize json object
             JSONObject jsonObject = new JSONObject();
             //adds employee data to json object
+            // pretty much like chopping up the employee again, but in a different way.
             jsonObject.put("id",emp.getEmployeeId());
             jsonObject.put("name",emp.getName());
             jsonObject.put("grossPay",emp.getGrossPay());
             //adds json object to array
+            // add in the chopped up employee in the storage.
             jsonArray.put(jsonObject);
         }
-        try(BufferedWriter writingJson = new BufferedWriter(new FileWriter(output))){
+        // Now we do a regular buffered writer process.
+        try(BufferedWriter writingJson = new BufferedWriter(new FileWriter(filePath))){
+            // This function just adds an indent to all the written information from the array
             writingJson.write(jsonArray.toString(4));
-            System.out.println("Created new file: " + output);
+            System.out.println("Created new file: " + filePath);
         }
         catch (IOException e){
             System.out.println("Error writing new file.");
             throw new RuntimeException(e);
         }
-        System.out.println("Full file path: " + output);
+        System.out.println("Full file path: " + filePath);
         waiting();
         userInput.close();
     }
 
 
-
-
-
- /*   public static void payroll(String filePath) {
-
-
-        // this try statement starts by telling the output to read the file line by line by using the buffer reader.
-        // Again, since we are doing a new thing, we make a new tool (variable) called "employeeReader".
-        try (BufferedReader employeeReader = new BufferedReader(new FileReader(filePath))) {
-
-            // this tells the bufferreader to start reading.
-            // Gets rid of the header row
-            // as we call "eats the line"
-            //   employeeReader.readLine();
-
-            // I will create a new variable that is a tool for holding the lines of each employee.
-            String employeeLines;
-
-            // This loop will say "As long as the lines are not empty, keep reading lines.
-            // I set the employeeLines equal to the reader because the reader is reading the employee lines.
-            while ((employeeLines = employeeReader.readLine()) != null) {
-
-                // Create a splitter for the employee lines.
-                // since I am using a new tool, I am creating a new variable.
-                // I split the employee line by the pipe.
-                String[] employeeListSplitter = employeeLines.split("\\|");
-
-                // Another way of skipping the header row.
-                // this is saying that if
-                if (employeeListSplitter[0].equals("id")){
-                    continue;
-                }
-
-                // Re-define each element of the employee and use the splitter to determine which element is which part of the string.
-                // If it's not a string already, we use the parser to convert.
-
-
-
-                /*
-                 Now that I just read the file, I have to create a new employee.
-                 I am basically saying that we put the employee in the blender and when we take it out,
-                 it's a new employee with the same information.
-
-                Employee listedEmployee = new Employee(id, name, hoursWorked, payRate);
-
-                // I am adding the new employees that I just created to the array that I created at the top of the main method.
-                // This is like putting a pile of labels in a basket before sticking them onto a new product.
-                employeeList.add(listedEmployee);
-
-
-                // Now we will display the new employee using formatting and also using the getters to get each piece of info from the employees.
-                System.out.printf("ID: %d | Name: %s | Gross Pay: $%.2f%n\n", listedEmployee.getEmployeeId(), listedEmployee.getName(), listedEmployee.getGrossPay());
-            }
-
-        } catch (FileNotFoundException e) {  // This first catch statement will catch an error if the file could not be found.
-            System.out.println("File could not be found.");
-            throw new RuntimeException(e);
-        } catch (IOException e) { // This second catch statement will catch any other type of error when reading the file.
-            System.out.println("An error has occurred.");
-            throw new RuntimeException(e);
-        }
-
-    }
-
-  */
-
-
-
+    // THIS METHOD IS FOR WAITING IN BETWEEN PROMPTS FOR USER EXPERIENCE.
     public static void waiting(){
         try {
             Thread.sleep(2000);
